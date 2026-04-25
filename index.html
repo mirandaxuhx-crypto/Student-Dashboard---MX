@@ -148,19 +148,16 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
 .stu-s{font-size:11px;color:var(--t2)}
 .stu-s span{font-weight:600;color:var(--tx);display:block;font-size:14px}
 .back-btn{font-size:12px;color:var(--ac);cursor:pointer;margin-bottom:14px;display:inline-flex;align-items:center;gap:5px}
-.saving{font-size:11px;color:var(--t3);margin-left:8px}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loading-screen" class="loading-screen">
   <div class="spinner"></div>
   <div style="font-size:13px;color:var(--t2)">Loading StudyHub…</div>
 </div>
 
-<!-- AUTH -->
 <div id="auth-screen" class="auth-wrap hidden">
   <div class="auth-box">
     <div class="auth-logo">Study<span>Hub</span></div>
@@ -192,7 +189,6 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
   </div>
 </div>
 
-<!-- STUDENT SHELL -->
 <div id="student-shell" class="shell hidden">
   <nav class="sb">
     <div class="logo">Study<span>Hub</span></div>
@@ -243,7 +239,7 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
     <div id="page-todo" class="page">
       <div class="ph"><div class="pt">To-do</div><div class="ps">Track what needs to get done</div></div>
       <div class="card">
-        <div class="ct">All items <span class="saving" id="todo-saving"></span></div>
+        <div class="ct">All items</div>
         <div id="todo-list"></div>
         <div class="ar">
           <input id="ti" type="text" placeholder="Task description…" style="flex:2;min-width:120px">
@@ -355,7 +351,6 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
   </main>
 </div>
 
-<!-- TEACHER LOGIN -->
 <div id="teacher-login" class="hidden auth-wrap">
   <div class="auth-box">
     <div class="auth-logo">Study<span>Hub</span></div>
@@ -369,7 +364,6 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
   </div>
 </div>
 
-<!-- TEACHER SHELL -->
 <div id="teacher-shell" class="shell hidden">
   <nav class="sb">
     <div class="logo">Study<span>Hub</span></div>
@@ -391,9 +385,9 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-const SUPA_URL = 'https://dzvopslwyznxachaizke.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dm9wc2x3eXpueGFjaGFpemtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjQ4MzMsImV4cCI6MjA5MjcwMDgzM30.M1MYZ-VLfSwPBvAhL7oBSLE_MWkeGRcADkmyXdTr0vs';
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+const SUPA_URL='https://dzvopslwyznxachaizke.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dm9wc2x3eXpueGFjaGFpemtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjQ4MzMsImV4cCI6MjA5MjcwMDgzM30.M1MYZ-VLfSwPBvAhL7oBSLE_MWkeGRcADkmyXdTr0vs';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
 const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DAYS=['Mon','Tue','Wed','Thu','Fri'];
@@ -407,32 +401,31 @@ const gbar=s=>s>=90?'#639922':s>=80?'#1D9E75':s>=70?'#EF9F27':'#D85A30';
 let chartInstances={};
 let currentUser=null;
 let currentProfile=null;
-let currentTeacher=false;
 
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', async()=>{
+window.addEventListener('DOMContentLoaded',async()=>{
   const {data:{session}}=await sb.auth.getSession();
   if(session){
     currentUser=session.user;
     await loadProfile();
-    if(currentProfile?.role==='teacher'){enterTeacher();}
-    else{enterStudent();}
+    if(currentProfile?.role==='teacher')enterTeacher();
+    else enterStudent();
   } else {
     show('auth-screen');
   }
   document.getElementById('loading-screen').classList.add('hidden');
 });
 
-sb.auth.onAuthStateChange(async(event,session)=>{
-  if(event==='SIGNED_IN'&&session){
-    currentUser=session.user;
-    await loadProfile();
-  }
-});
-
 async function loadProfile(){
   const {data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
-  currentProfile=data;
+  // always fall back to auth metadata so name is never missing
+  currentProfile=data||{
+    name:currentUser.user_metadata?.name||'Student',
+    grade:currentUser.user_metadata?.grade||'',
+    role:currentUser.user_metadata?.role||'student'
+  };
+  if(!currentProfile.name){
+    currentProfile.name=currentUser.user_metadata?.name||'Student';
+  }
 }
 
 function show(id){
@@ -441,7 +434,6 @@ function show(id){
   document.getElementById(id).classList.remove('hidden');
 }
 
-// ── AUTH ──
 function switchAuthTab(tab,btn){
   document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
@@ -456,42 +448,47 @@ async function doRegister(){
   const grade=document.getElementById('rg-g').value;
   const err=document.getElementById('rg-err');
   if(!name||!email||!pass||!grade){err.textContent='Please fill in all fields.';return}
-  err.textContent='Registering…';
-  const {error}=await sb.auth.signUp({email,password:pass,options:{data:{name,grade,role:'student'}}});
+  err.style.color='#A32D2D';err.textContent='Creating account…';
+  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name,grade,role:'student'}}});
   if(error){err.textContent=error.message;return}
+  currentUser=data.user;
+  await loadProfile();
   err.style.color='#3B6D11';
-  err.textContent='Account created! Please check your email to confirm, then sign in.';
+  err.textContent='Account created! Signing you in…';
+  setTimeout(()=>enterStudent(),800);
 }
 
 async function doLogin(){
   const email=document.getElementById('li-e').value.trim();
   const pass=document.getElementById('li-p').value;
   const err=document.getElementById('li-err');
-  err.textContent='Signing in…';
+  err.style.color='#A32D2D';err.textContent='Signing in…';
   const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){err.textContent=error.message;return}
   currentUser=data.user;
   await loadProfile();
-  if(currentProfile?.role==='teacher'){enterTeacher();}
-  else{err.textContent='';enterStudent();}
+  err.textContent='';
+  if(currentProfile?.role==='teacher')enterTeacher();
+  else enterStudent();
 }
 
 async function doLogout(){
   await sb.auth.signOut();
-  currentUser=null;currentProfile=null;currentTeacher=false;
+  currentUser=null;currentProfile=null;
   show('auth-screen');
 }
 
 function enterStudent(){
-  document.getElementById('s-role-label').textContent=`${currentProfile?.name||'Student'} · ${currentProfile?.grade||''}`;
-  document.getElementById('dash-greet').textContent=`Welcome, ${(currentProfile?.name||'Student').split(' ')[0]}`;
+  const name=currentProfile?.name||currentUser?.user_metadata?.name||'Student';
+  const grade=currentProfile?.grade||currentUser?.user_metadata?.grade||'';
+  document.getElementById('s-role-label').textContent=`${name}${grade?' · '+grade:''}`;
+  document.getElementById('dash-greet').textContent=`Welcome, ${name.split(' ')[0]}`;
   document.getElementById('dash-date').textContent=fullDate();
   show('student-shell');
   navTo('dashboard');
   loadAll();
 }
 
-// ── TEACHER ──
 function showTeacherLogin(){show('teacher-login')}
 function hideTeacherLogin(){show('student-shell')}
 
@@ -510,14 +507,13 @@ async function doTeacherLogin(){
 }
 
 async function enterTeacher(){
-  currentTeacher=true;
   show('teacher-shell');
   await loadTeacherData();
 }
 
 async function teacherLogout(){
   await sb.auth.signOut();
-  currentUser=null;currentProfile=null;currentTeacher=false;
+  currentUser=null;currentProfile=null;
   show('auth-screen');
 }
 
@@ -538,21 +534,18 @@ async function loadTeacherData(){
     const stodos=(todos||[]).filter(t=>t.user_id===s.id);
     const done=stodos.filter(t=>t.done).length;
     const pct=stodos.length?Math.round((done/stodos.length)*100):0;
-    const ssubj=(subjects||[]).filter(x=>x.user_id===s.id).length;
-    const sgoals=(goals||[]).filter(x=>x.user_id===s.id).length;
-    const sstudy=(study||[]).filter(x=>x.user_id===s.id).length;
     const initials=(s.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    return`<div class="stu-card" onclick="showStudentDetail('${s.id}','${s.name}','${s.grade}')">
+    return`<div class="stu-card" onclick="showStudentDetail('${s.id}','${s.name}','${s.grade||''}')">
       <div style="display:flex;align-items:center;gap:11px">
         <div class="stu-av">${initials}</div>
-        <div><div style="font-size:14px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--t2)">${s.grade}</div></div>
+        <div><div style="font-size:14px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--t2)">${s.grade||''}</div></div>
       </div>
       <div class="stu-stats">
         <div class="stu-s"><span>${done}/${stodos.length}</span>To-dos</div>
         <div class="stu-s"><span>${pct}%</span>Completion</div>
-        <div class="stu-s"><span>${ssubj}</span>Subjects</div>
-        <div class="stu-s"><span>${sgoals}</span>Goals</div>
-        <div class="stu-s"><span>${sstudy}</span>Study notes</div>
+        <div class="stu-s"><span>${(subjects||[]).filter(x=>x.user_id===s.id).length}</span>Subjects</div>
+        <div class="stu-s"><span>${(goals||[]).filter(x=>x.user_id===s.id).length}</span>Goals</div>
+        <div class="stu-s"><span>${(study||[]).filter(x=>x.user_id===s.id).length}</span>Study notes</div>
       </div>
     </div>`;
   }).join('');
@@ -577,7 +570,7 @@ async function showStudentDetail(uid,name,grade){
     </div>
     <div class="g2">
       <div class="card"><div class="ct">Grades & exam records</div>
-        ${(subjects||[]).map(s=>`<div style="margin-bottom:12px">
+        ${(subjects||[]).length?(subjects||[]).map(s=>`<div style="margin-bottom:12px">
           <div style="font-size:13px;font-weight:600;margin-bottom:6px">${s.name}</div>
           ${(exams||[]).filter(e=>e.subject_id===s.id).map(e=>`
             <div class="exam-row">
@@ -587,31 +580,31 @@ async function showStudentDetail(uid,name,grade){
               <span class="exam-ch">${e.chapter||''}</span>
               ${e.review?`<span style="font-size:11px;color:var(--ab)">${e.review}</span>`:''}
             </div>`).join('')||'<div style="font-size:12px;color:var(--t3)">No exam records.</div>'}
-        </div>`).join('')||'<div style="font-size:13px;color:var(--t3)">No subjects.</div>'}
+        </div>`).join(''):'<div style="font-size:13px;color:var(--t3)">No subjects.</div>'}
       </div>
       <div class="card"><div class="ct">To-do list</div>
-        ${(todos||[]).map(t=>`<div class="todo-item">
+        ${(todos||[]).length?(todos||[]).map(t=>`<div class="todo-item">
           <div class="ck ${t.done?'done':''}"></div>
           <span class="tk ${t.done?'done':''}">${t.text}</span>
           <span class="tdu">${t.due_date||''}</span>
           <span class="st">${t.subject||''}</span>
-        </div>`).join('')||'<div style="font-size:13px;color:var(--t3)">No tasks.</div>'}
+        </div>`).join(''):'<div style="font-size:13px;color:var(--t3)">No tasks.</div>'}
       </div>
       <div class="card"><div class="ct">Goals</div>
-        ${(goals||[]).map(g=>`<div class="goal-item">
+        ${(goals||[]).length?(goals||[]).map(g=>`<div class="goal-item">
           <span class="goal-txt">${g.name}</span>
           <span class="goal-lbl ${g.label}">${goalLabels[g.label]||g.label}</span>
           ${g.due_date?`<span class="goal-ddl">${g.due_date}</span>`:''}
-        </div>`).join('')||'<div style="font-size:13px;color:var(--t3)">No goals.</div>'}
+        </div>`).join(''):'<div style="font-size:13px;color:var(--t3)">No goals.</div>'}
       </div>
       <div class="card"><div class="ct">Study notes</div>
-        ${(study||[]).map(r=>`<div style="padding:8px 0;border-bottom:.5px solid var(--bd)">
+        ${(study||[]).length?(study||[]).map(r=>`<div style="padding:8px 0;border-bottom:.5px solid var(--bd)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
             <span style="font-size:13px;font-weight:500">${r.title}</span>
             ${r.tag?`<span class="rtag ${r.tag}">${r.tag_label}</span>`:''}
           </div>
           <div style="font-size:12px;color:var(--t2)">${r.content.slice(0,100)}${r.content.length>100?'…':''}</div>
-        </div>`).join('')||'<div style="font-size:13px;color:var(--t3)">No study notes.</div>'}
+        </div>`).join(''):'<div style="font-size:13px;color:var(--t3)">No study notes.</div>'}
       </div>
     </div>`;
   document.querySelectorAll('#tmain .page').forEach(p=>p.classList.remove('active'));
@@ -623,7 +616,6 @@ function backToList(){
   document.getElementById('tp-students').classList.add('active');
 }
 
-// ── STUDENT NAV ──
 function nav(btn,page){
   document.querySelectorAll('#student-shell .nb[data-p]').forEach(n=>n.classList.remove('active'));
   btn.classList.add('active');
@@ -650,12 +642,10 @@ async function loadAll(){
   updateDash();
 }
 
-// ── TODO ──
 let todos=[];
 async function loadTodos(){
   const {data}=await sb.from('todos').select('*').eq('user_id',currentUser.id).order('created_at');
-  todos=data||[];
-  renderTodos();
+  todos=data||[];renderTodos();
 }
 function renderTodos(){
   document.getElementById('todo-list').innerHTML=todos.length?todos.map(t=>`
@@ -677,8 +667,7 @@ async function addTask(){
 }
 async function toggleTask(id,done){
   await sb.from('todos').update({done}).eq('id',id);
-  const t=todos.find(x=>x.id===id);if(t)t.done=done;
-  renderTodos();
+  const t=todos.find(x=>x.id===id);if(t)t.done=done;renderTodos();
 }
 async function removeTask(id){
   await sb.from('todos').delete().eq('id',id);
@@ -695,18 +684,16 @@ function updateCircle(){
   document.getElementById('cpend').textContent=total-done;
 }
 
-// ── GRADES ──
 let subjects=[];let exams=[];
 async function loadGrades(){
   const [{data:s},{data:e}]=await Promise.all([
     sb.from('subjects').select('*').eq('user_id',currentUser.id).order('created_at'),
     sb.from('exams').select('*').eq('user_id',currentUser.id).order('created_at'),
   ]);
-  subjects=s||[];exams=e||[];
-  renderGrades();
+  subjects=s||[];exams=e||[];renderGrades();
 }
 function renderGrades(){
-  document.getElementById('subj-list').innerHTML=subjects.map((s,si)=>{
+  document.getElementById('subj-list').innerHTML=subjects.map(s=>{
     const se=exams.filter(e=>e.subject_id===s.id);
     const cid='chart-'+s.id;
     return`<div class="subj-block">
@@ -772,12 +759,11 @@ async function addExam(sid){
   const {data}=await sb.from('exams').insert({user_id:currentUser.id,subject_id:sid,week,score:Math.min(100,Math.max(0,score)),chapter:document.getElementById('ec-'+sid).value.trim(),review:document.getElementById('er-'+sid).value.trim()}).select().single();
   if(data){exams.push(data);renderGrades();updateDash();}
 }
-async function removeExam(id,sid){
+async function removeExam(id){
   await sb.from('exams').delete().eq('id',id);
   exams=exams.filter(x=>x.id!==id);renderGrades();
 }
 
-// ── SCHEDULE ──
 let schedule=[];
 async function loadSchedule(){
   const {data}=await sb.from('schedule').select('*').eq('user_id',currentUser.id).order('created_at');
@@ -803,7 +789,6 @@ async function rmCls(id){
   schedule=schedule.filter(x=>x.id!==id);renderSchedule();
 }
 
-// ── GOALS ──
 let goals=[];
 async function loadGoals(){
   const {data}=await sb.from('goals').select('*').eq('user_id',currentUser.id).order('created_at');
@@ -831,7 +816,6 @@ async function removeGoal(id){
   goals=goals.filter(x=>x.id!==id);renderGoals();
 }
 
-// ── NOTES ──
 let notes=[];
 async function loadNotes(){
   const {data}=await sb.from('notes').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
@@ -858,7 +842,6 @@ async function removeNote(id){
   notes=notes.filter(n=>n.id!==id);renderNotes();
 }
 
-// ── STUDY ──
 let studyEntries=[];
 async function loadStudy(){
   const {data}=await sb.from('study_entries').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
@@ -909,7 +892,6 @@ async function removeStudy(id){
   document.getElementById('ov-study').textContent=studyEntries.length;
 }
 
-// ── DASHBOARD ──
 function updateDash(){
   document.getElementById('ov-tasks').textContent=todos.filter(t=>!t.done).length;
   const up=todos.filter(t=>!t.done).slice(0,4);
