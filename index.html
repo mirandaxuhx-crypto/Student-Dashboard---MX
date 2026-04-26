@@ -397,7 +397,7 @@ const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov',
 // Mon=0 ... Sun=6
 const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const WEEKEND=['Sat','Sun'];
-const todayIdx=(()=>{const d=new Date().getDay();return d===0?6:d-1})();
+const todayIdx=-1; // today highlight disabled
 function fullDate(){const n=new Date();return`${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][n.getDay()]}, ${months[n.getMonth()]} ${n.getDate()}, ${n.getFullYear()}`}
 const goalLabels={'lbl-interest':'Hobbies & interests','lbl-study':'Academic study','lbl-extend':'Extended learning','lbl-life':'Life skills','lbl-other':'Other'};
 const typeLabels={'ts2':'Summary','tq':'Key quote','tv':'Vocabulary','tr':'Reflection'};
