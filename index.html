@@ -39,12 +39,12 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
 .field input:focus,.field select:focus{border-color:var(--am)}
 .btn-full{width:100%;padding:10px;border:none;border-radius:var(--rs);background:var(--ac);color:#fff;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:4px}
 .btn-full:hover{background:#4A42CC}
-.auth-err{font-size:12px;color:#A32D2D;margin-top:8px;text-align:center;min-height:18px}
+.auth-err{font-size:12px;margin-top:8px;text-align:center;min-height:18px}
 .shell{display:grid;grid-template-columns:210px 1fr;min-height:100vh}
 .sb{background:var(--tx);padding:24px 16px;display:flex;flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;overflow-y:auto}
 .logo{font-family:'Fraunces',serif;font-size:20px;font-weight:600;color:#fff;margin-bottom:4px}
 .logo span{color:var(--am)}
-.role-b{font-size:11px;color:rgba(255,255,255,.4);padding-bottom:14px;margin-bottom:14px;border-bottom:.5px solid rgba(255,255,255,.1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.role-b{font-size:11px;padding-bottom:14px;margin-bottom:14px;border-bottom:.5px solid rgba(255,255,255,.1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rb-s{color:#9FE1CB}.rb-t{color:#FAC775}
 .nl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.28);padding:11px 8px 4px;margin-top:2px}
 .nb{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.6);background:transparent;border:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;transition:all .15s}
@@ -111,11 +111,12 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
 .lbl-life{background:var(--abl);color:var(--ab)}
 .lbl-other{background:var(--s2);color:var(--t2)}
 .goal-ddl{font-size:11px;color:var(--t3);flex-shrink:0}
-.wk{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
 .dc{background:var(--s2);border-radius:var(--rs);padding:10px 8px}
 .dn{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t2);margin-bottom:8px;text-align:center}
 .dc.tod .dn{color:var(--ac)}
 .dc.tod{background:var(--al);border:1px solid var(--am)}
+.dc.weekend{background:#F5F0F8}
 .cb{border-radius:5px;padding:5px 7px;margin-bottom:4px;font-size:11px}
 .ct2{font-size:9px;opacity:.7;margin-top:1px}
 .cp{background:#CECBF6;color:#3C3489}.ctc{background:#9FE1CB;color:#085041}
@@ -217,7 +218,7 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
         <div class="card">
           <div class="ct">To-do completion</div>
           <div class="circ-wrap">
-            <svg width="86" height="86" viewBox="0 0 86 86" role="img" aria-label="To-do completion">
+            <svg width="86" height="86" viewBox="0 0 86 86">
               <circle cx="43" cy="43" r="34" fill="none" stroke="#F0EDE6" stroke-width="9"/>
               <circle id="cprog" cx="43" cy="43" r="34" fill="none" stroke="#7F77DD" stroke-width="9"
                 stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"
@@ -265,7 +266,10 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
       <div class="card" style="margin-top:0">
         <div class="ct">Add a class</div>
         <div class="ar">
-          <select id="sc-day" style="max-width:75px"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option></select>
+          <select id="sc-day" style="max-width:80px">
+            <option>Mon</option><option>Tue</option><option>Wed</option>
+            <option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option>
+          </select>
           <input id="sc-name" type="text" placeholder="Class name…" style="flex:1">
           <input id="sc-time" type="text" placeholder="e.g. 8:00–9:00">
           <select id="sc-col"><option value="cp">Purple</option><option value="ctc">Teal</option><option value="ca2">Amber</option><option value="cc2">Coral</option><option value="cg">Green</option></select>
@@ -355,7 +359,7 @@ body{background:var(--bg);color:var(--tx);min-height:100vh}
   <div class="auth-box">
     <div class="auth-logo">Study<span>Hub</span></div>
     <div style="font-size:10px;font-weight:600;color:var(--am);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Teacher portal</div>
-    <div class="auth-desc">Private access — students cannot view this portal</div>
+    <div class="auth-desc">Private access only</div>
     <div class="field"><label>Email</label><input id="tu" type="email" placeholder="teacher@email.com"></div>
     <div class="field"><label>Password</label><input id="tp" type="password" placeholder="Password"></div>
     <button class="btn-full" onclick="doTeacherLogin()">Sign in to teacher portal</button>
@@ -390,8 +394,10 @@ const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
 const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const DAYS=['Mon','Tue','Wed','Thu','Fri'];
-const todayIdx=(()=>{const d=new Date().getDay();return d===0?4:d-1})();
+// Mon=0 ... Sun=6
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const WEEKEND=['Sat','Sun'];
+const todayIdx=(()=>{const d=new Date().getDay();return d===0?6:d-1})();
 function fullDate(){const n=new Date();return`${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][n.getDay()]}, ${months[n.getMonth()]} ${n.getDate()}, ${n.getFullYear()}`}
 const goalLabels={'lbl-interest':'Hobbies & interests','lbl-study':'Academic study','lbl-extend':'Extended learning','lbl-life':'Life skills','lbl-other':'Other'};
 const typeLabels={'ts2':'Summary','tq':'Key quote','tv':'Vocabulary','tr':'Reflection'};
@@ -401,49 +407,42 @@ let chartInstances={};
 let currentUser=null;
 let currentProfile=null;
 
-// ── INIT ──
+function err(id,msg,ok=false){
+  const el=document.getElementById(id);
+  el.style.color=ok?'#3B6D11':'#A32D2D';
+  el.textContent=msg;
+}
+
 window.addEventListener('DOMContentLoaded',async()=>{
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){
-    currentUser=session.user;
-    await loadProfile();
-    if(currentProfile?.role==='teacher')enterTeacher();
-    else enterStudent();
-  } else {
-    show('auth-screen');
-  }
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    if(session){
+      currentUser=session.user;
+      await loadProfile();
+      if(currentProfile?.role==='teacher')enterTeacher();
+      else enterStudent();
+    } else {
+      show('auth-screen');
+    }
+  }catch(e){show('auth-screen')}
   document.getElementById('loading-screen').classList.add('hidden');
 });
 
-// ── PROFILE ──
 async function loadProfile(){
   try{
-    const {data,error}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+    const {data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
     if(data){
       currentProfile=data;
-      if(!currentProfile.name){
-        currentProfile.name=currentUser.user_metadata?.name||'Student';
-      }
+      if(!currentProfile.name)currentProfile.name=currentUser.user_metadata?.name||'Student';
     } else {
-      // profile not found — create it now from auth metadata
       const meta=currentUser.user_metadata||{};
-      const insert={
-        id:currentUser.id,
-        name:meta.name||'Student',
-        grade:meta.grade||'',
-        role:meta.role||'student'
-      };
-      await sb.from('profiles').upsert(insert);
-      currentProfile=insert;
+      const p={id:currentUser.id,name:meta.name||'Student',grade:meta.grade||'',role:meta.role||'student'};
+      await sb.from('profiles').upsert(p);
+      currentProfile=p;
     }
-  } catch(e){
-    // fallback: just use auth metadata
+  }catch(e){
     const meta=currentUser.user_metadata||{};
-    currentProfile={
-      name:meta.name||'Student',
-      grade:meta.grade||'',
-      role:meta.role||'student'
-    };
+    currentProfile={name:meta.name||'Student',grade:meta.grade||'',role:meta.role||'student'};
   }
 }
 
@@ -453,7 +452,6 @@ function show(id){
   document.getElementById(id).classList.remove('hidden');
 }
 
-// ── AUTH ──
 function switchAuthTab(tab,btn){
   document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
@@ -466,33 +464,27 @@ async function doRegister(){
   const email=document.getElementById('rg-e').value.trim();
   const pass=document.getElementById('rg-p').value;
   const grade=document.getElementById('rg-g').value;
-  const err=document.getElementById('rg-err');
-  if(!name||!email||!pass||!grade){err.style.color='#A32D2D';err.textContent='Please fill in all fields.';return}
-  err.style.color='#A32D2D';err.textContent='Creating account…';
-  const {data,error}=await sb.auth.signUp({
-    email,password:pass,
-    options:{data:{name,grade,role:'student'}}
-  });
-  if(error){err.textContent=error.message;return}
+  if(!name||!email||!pass||!grade){err('rg-err','Please fill in all fields.');return}
+  err('rg-err','Creating account…');
+  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name,grade,role:'student'}}});
+  if(error){err('rg-err',error.message);return}
   currentUser=data.user;
-  // manually upsert profile in case trigger fails
   await sb.from('profiles').upsert({id:currentUser.id,name,grade,role:'student'});
   await loadProfile();
-  err.style.color='#3B6D11';
-  err.textContent='Account created! Signing you in…';
-  setTimeout(()=>enterStudent(),600);
+  err('rg-err','Account created! Signing you in…',true);
+  setTimeout(()=>enterStudent(),800);
 }
 
 async function doLogin(){
   const email=document.getElementById('li-e').value.trim();
   const pass=document.getElementById('li-p').value;
-  const err=document.getElementById('li-err');
-  err.style.color='#A32D2D';err.textContent='Signing in…';
+  if(!email||!pass){err('li-err','Please enter email and password.');return}
+  err('li-err','Signing in…');
   const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error){err.textContent=error.message;return}
+  if(error){err('li-err',error.message);return}
   currentUser=data.user;
   await loadProfile();
-  err.textContent='';
+  document.getElementById('li-err').textContent='';
   if(currentProfile?.role==='teacher')enterTeacher();
   else enterStudent();
 }
@@ -504,8 +496,8 @@ async function doLogout(){
 }
 
 function enterStudent(){
-  const name=currentProfile?.name||currentUser?.user_metadata?.name||'Student';
-  const grade=currentProfile?.grade||currentUser?.user_metadata?.grade||'';
+  const name=currentProfile?.name||'Student';
+  const grade=currentProfile?.grade||'';
   document.getElementById('s-role-label').textContent=`${name}${grade?' · '+grade:''}`;
   document.getElementById('dash-greet').textContent=`Welcome, ${name.split(' ')[0]}`;
   document.getElementById('dash-date').textContent=fullDate();
@@ -514,33 +506,27 @@ function enterStudent(){
   loadAll();
 }
 
-// ── TEACHER ──
 function showTeacherLogin(){show('teacher-login')}
 function hideTeacherLogin(){show('student-shell')}
 
 async function doTeacherLogin(){
   const email=document.getElementById('tu').value.trim();
   const pass=document.getElementById('tp').value;
-  const err=document.getElementById('t-err');
-  err.style.color='#A32D2D';err.textContent='Signing in…';
+  if(!email||!pass){err('t-err','Please enter email and password.');return}
+  err('t-err','Signing in…');
   const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error){err.textContent=error.message;return}
+  if(error){err('t-err',error.message);return}
   currentUser=data.user;
   await loadProfile();
   if(currentProfile?.role!=='teacher'){
-    err.textContent='This account does not have teacher access.';
-    await sb.auth.signOut();
-    currentUser=null;currentProfile=null;
-    return;
+    err('t-err','This account does not have teacher access.');
+    await sb.auth.signOut();currentUser=null;currentProfile=null;return;
   }
-  err.textContent='';
+  document.getElementById('t-err').textContent='';
   enterTeacher();
 }
 
-async function enterTeacher(){
-  show('teacher-shell');
-  await loadTeacherData();
-}
+async function enterTeacher(){show('teacher-shell');await loadTeacherData()}
 
 async function teacherLogout(){
   await sb.auth.signOut();
@@ -548,11 +534,319 @@ async function teacherLogout(){
   show('auth-screen');
 }
 
+function nav(btn,page){
+  document.querySelectorAll('#student-shell .nb[data-p]').forEach(n=>n.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#smain .page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  loadAll();
+}
+function navTo(page){
+  document.querySelectorAll('#student-shell .nb[data-p]').forEach(n=>n.classList.toggle('active',n.dataset.p===page));
+  document.querySelectorAll('#smain .page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+}
+function stab(tab,btn){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.spanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('sp-'+tab).classList.add('active');
+  loadStudy();
+}
+
+async function loadAll(){
+  if(!currentUser)return;
+  await Promise.all([loadTodos(),loadGrades(),loadSchedule(),loadGoals(),loadNotes(),loadStudy()]);
+  updateDash();
+}
+
+/* ── TODOS ── */
+let todos=[];
+async function loadTodos(){
+  const {data,error}=await sb.from('todos').select('*').eq('user_id',currentUser.id).order('created_at');
+  if(!error)todos=data||[];
+  renderTodos();
+}
+function renderTodos(){
+  document.getElementById('todo-list').innerHTML=todos.length?todos.map(t=>`
+    <div class="todo-item">
+      <div class="ck ${t.done?'done':''}" onclick="toggleTask(${t.id},${!t.done})"></div>
+      <span class="tk ${t.done?'done':''}">${t.text}</span>
+      <span class="tdu">${t.due_date||''}</span>
+      <span class="st">${t.subject||''}</span>
+      <span class="rm" onclick="removeTask(${t.id})">✕</span>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--t3);padding:10px 0">No items yet.</div>';
+  updateCircle();updateDash();
+}
+async function addTask(){
+  const text=document.getElementById('ti').value.trim();if(!text)return;
+  const row={user_id:currentUser.id,text,subject:document.getElementById('ts').value.trim(),due_date:document.getElementById('td').value||null,done:false};
+  const {data,error}=await sb.from('todos').insert(row).select().single();
+  if(error){console.error('addTask',error);return}
+  ['ti','ts','td'].forEach(i=>document.getElementById(i).value='');
+  todos.push(data);renderTodos();
+}
+async function toggleTask(id,done){
+  await sb.from('todos').update({done}).eq('id',id);
+  const t=todos.find(x=>x.id===id);if(t)t.done=done;renderTodos();
+}
+async function removeTask(id){
+  await sb.from('todos').delete().eq('id',id);
+  todos=todos.filter(x=>x.id!==id);renderTodos();
+}
+function updateCircle(){
+  const total=todos.length,done=todos.filter(t=>t.done).length;
+  const pct=total?Math.round((done/total)*100):0;
+  const circ=2*Math.PI*34;
+  document.getElementById('cprog').setAttribute('stroke-dashoffset',(circ-(circ*(pct/100))).toFixed(1));
+  document.getElementById('cpct').textContent=pct+'%';
+  document.getElementById('cdone').textContent=done;
+  document.getElementById('ctotal').textContent=total;
+  document.getElementById('cpend').textContent=total-done;
+}
+
+/* ── GRADES ── */
+let subjects=[];let exams=[];
+async function loadGrades(){
+  const [{data:s},{data:e}]=await Promise.all([
+    sb.from('subjects').select('*').eq('user_id',currentUser.id).order('created_at'),
+    sb.from('exams').select('*').eq('user_id',currentUser.id).order('created_at'),
+  ]);
+  subjects=s||[];exams=e||[];renderGrades();
+}
+function renderGrades(){
+  document.getElementById('subj-list').innerHTML=subjects.map(s=>{
+    const se=exams.filter(e=>e.subject_id===s.id);
+    const cid='chart-'+s.id;
+    return`<div class="subj-block">
+      <div class="subj-hdr"><span class="subj-name">${s.name}</span><span class="rm" onclick="removeSubject(${s.id})">✕</span></div>
+      ${se.length?`<div style="margin-bottom:10px">
+        ${se.map(e=>`<div class="exam-row">
+          <span class="exam-week">${e.week}</span>
+          <div class="exam-bar-w"><div class="exam-bar" style="width:${Math.min(100,e.score||0)}%;background:${gbar(e.score||0)}"></div></div>
+          <span class="exam-score" style="color:${gcol(e.score||0)}">${e.score??'—'}</span>
+          <span class="exam-ch">${e.chapter||''}</span>
+          <span class="exam-rev">${e.review||''}</span>
+          <span class="rm" onclick="removeExam(${e.id})">✕</span>
+        </div>`).join('')}
+      </div>
+      ${se.length>=2?`<div style="margin-bottom:10px"><div class="chart-wrap"><canvas id="${cid}"></canvas></div></div>`:''}`:''}
+      <details style="margin-top:6px">
+        <summary style="font-size:12px;color:var(--ac);cursor:pointer;padding:4px 0">+ Add exam record</summary>
+        <div class="add-exam-form">
+          <div class="frow">
+            <input class="fi" id="ew-${s.id}" type="text" placeholder="Week (e.g. Week 3 / Apr 28)">
+            <input class="fi" id="es-${s.id}" type="number" min="0" max="100" placeholder="Score (0–100)" style="max-width:120px">
+          </div>
+          <div class="frow">
+            <input class="fi" id="ec-${s.id}" type="text" placeholder="Chapter / Section">
+            <input class="fi" id="er-${s.id}" type="text" placeholder="Exam review notes">
+          </div>
+          <button class="btn btn-p btn-sm" onclick="addExam(${s.id})" style="width:fit-content">Save exam</button>
+        </div>
+      </details>
+    </div>`;
+  }).join('')||'';
+  subjects.forEach(s=>{
+    const se=exams.filter(e=>e.subject_id===s.id);
+    if(se.length<2)return;
+    const cid='chart-'+s.id;
+    const el=document.getElementById(cid);if(!el)return;
+    if(chartInstances[cid])chartInstances[cid].destroy();
+    chartInstances[cid]=new Chart(el,{
+      type:'line',
+      data:{labels:se.map(e=>e.week),datasets:[{label:'Score',data:se.map(e=>e.score??null),borderColor:'#7F77DD',backgroundColor:'rgba(127,119,221,0.08)',pointBackgroundColor:'#7F77DD',tension:0.3,fill:true,pointRadius:5}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{y:{min:0,max:100,ticks:{color:'#6B6860',font:{size:11}},grid:{color:'rgba(26,24,20,0.06)'}},
+          x:{ticks:{color:'#6B6860',font:{size:11},maxRotation:30},grid:{display:false}}}}
+    });
+  });
+}
+async function addSubject(){
+  const name=document.getElementById('gs').value.trim();if(!name)return;
+  const {data,error}=await sb.from('subjects').insert({user_id:currentUser.id,name}).select().single();
+  if(error){console.error('addSubject',error);return}
+  document.getElementById('gs').value='';subjects.push(data);renderGrades();
+}
+async function removeSubject(id){
+  await sb.from('subjects').delete().eq('id',id);
+  subjects=subjects.filter(x=>x.id!==id);exams=exams.filter(x=>x.subject_id!==id);renderGrades();
+}
+async function addExam(sid){
+  const week=document.getElementById('ew-'+sid).value.trim();
+  const score=parseFloat(document.getElementById('es-'+sid).value);
+  if(!week||isNaN(score))return;
+  const {data,error}=await sb.from('exams').insert({user_id:currentUser.id,subject_id:sid,week,score:Math.min(100,Math.max(0,score)),chapter:document.getElementById('ec-'+sid).value.trim(),review:document.getElementById('er-'+sid).value.trim()}).select().single();
+  if(error){console.error('addExam',error);return}
+  exams.push(data);renderGrades();updateDash();
+}
+async function removeExam(id){
+  await sb.from('exams').delete().eq('id',id);
+  exams=exams.filter(x=>x.id!==id);renderGrades();
+}
+
+/* ── SCHEDULE (Mon–Sun) ── */
+let schedule=[];
+async function loadSchedule(){
+  const {data}=await sb.from('schedule').select('*').eq('user_id',currentUser.id).order('created_at');
+  schedule=data||[];renderSchedule();
+}
+function renderSchedule(){
+  document.getElementById('week-grid').innerHTML=DAYS.map((d,i)=>`
+    <div class="dc ${i===todayIdx?'tod':''} ${WEEKEND.includes(d)?'weekend':''}">
+      <div class="dn">${d}${i===todayIdx?' · today':''}</div>
+      ${schedule.filter(c=>c.day===d).map(c=>`
+        <div class="cb ${c.color}">
+          <div style="font-weight:600">${c.name}</div>
+          <div class="ct2">${c.time||''}</div>
+          <div style="font-size:9px;opacity:.4;cursor:pointer;margin-top:2px" onclick="rmCls(${c.id})">remove</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+async function addCls(){
+  const name=document.getElementById('sc-name').value.trim();if(!name)return;
+  const {data,error}=await sb.from('schedule').insert({user_id:currentUser.id,day:document.getElementById('sc-day').value,name,time:document.getElementById('sc-time').value.trim(),color:document.getElementById('sc-col').value}).select().single();
+  if(error){console.error('addCls',error);return}
+  document.getElementById('sc-name').value='';document.getElementById('sc-time').value='';
+  schedule.push(data);renderSchedule();
+}
+async function rmCls(id){
+  await sb.from('schedule').delete().eq('id',id);
+  schedule=schedule.filter(x=>x.id!==id);renderSchedule();
+}
+
+/* ── GOALS ── */
+let goals=[];
+async function loadGoals(){
+  const {data}=await sb.from('goals').select('*').eq('user_id',currentUser.id).order('created_at');
+  goals=data||[];renderGoals();
+}
+function renderGoals(){
+  document.getElementById('goal-list').innerHTML=goals.length?goals.map(g=>`
+    <div class="goal-item">
+      <span class="goal-txt">${g.name}</span>
+      <span class="goal-lbl ${g.label}">${goalLabels[g.label]||g.label}</span>
+      ${g.due_date?`<span class="goal-ddl">${g.due_date}</span>`:''}
+      <span class="rm" onclick="removeGoal(${g.id})">✕</span>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--t3);padding:10px 0">No goals yet.</div>';
+  document.getElementById('ov-goals').textContent=goals.length;
+}
+async function addGoal(){
+  const name=document.getElementById('gn').value.trim();if(!name)return;
+  const {data,error}=await sb.from('goals').insert({user_id:currentUser.id,name,label:document.getElementById('gl').value,due_date:document.getElementById('gd').value||null}).select().single();
+  if(error){console.error('addGoal',error);return}
+  ['gn','gd'].forEach(i=>document.getElementById(i).value='');
+  goals.push(data);renderGoals();
+}
+async function removeGoal(id){
+  await sb.from('goals').delete().eq('id',id);
+  goals=goals.filter(x=>x.id!==id);renderGoals();
+}
+
+/* ── NOTES ── */
+let notes=[];
+async function loadNotes(){
+  const {data}=await sb.from('notes').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  notes=data||[];renderNotes();
+}
+function renderNotes(){
+  document.getElementById('notes-grid').innerHTML=notes.map(n=>`
+    <div class="nc2 ${n.color}"><div class="nt2">${n.title}</div><div class="np2">${n.content}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px">
+      <span style="font-size:10px;opacity:.55">${n.created_at?new Date(n.created_at).toLocaleDateString():''}</span>
+      <span onclick="removeNote(${n.id})" style="cursor:pointer;opacity:.5;font-size:11px">✕</span>
+    </div></div>`).join('')||'<div style="font-size:13px;color:var(--t3)">No notes yet.</div>';
+}
+async function addNote(){
+  const title=document.getElementById('nt-title').value.trim();
+  const content=document.getElementById('nt-content').value.trim();
+  if(!title||!content)return;
+  const {data,error}=await sb.from('notes').insert({user_id:currentUser.id,title,content,color:document.getElementById('nt-color').value}).select().single();
+  if(error){console.error('addNote',error);return}
+  document.getElementById('nt-title').value='';document.getElementById('nt-content').value='';
+  notes.unshift(data);renderNotes();
+}
+async function removeNote(id){
+  await sb.from('notes').delete().eq('id',id);
+  notes=notes.filter(n=>n.id!==id);renderNotes();
+}
+
+/* ── STUDY ── */
+let studyEntries=[];
+async function loadStudy(){
+  const {data}=await sb.from('study_entries').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  studyEntries=data||[];
+  renderStudyList('reading');renderStudyList('online');renderStudyList('journal');
+  document.getElementById('ov-study').textContent=studyEntries.length;
+}
+function renderStudyList(type){
+  const el=document.getElementById('list-'+type);if(!el)return;
+  const list=studyEntries.filter(e=>e.type===type);
+  el.innerHTML=list.length?list.map(r=>`
+    <div class="scard">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div><div class="sttl">${r.title}</div><div class="smeta">${r.sub||''} ${r.created_at?'· '+new Date(r.created_at).toLocaleDateString():''}</div></div>
+        <div style="display:flex;gap:7px;align-items:center">
+          ${r.tag?`<span class="rtag ${r.tag}">${r.tag_label}</span>`:''}
+          <span class="rm" onclick="removeStudy(${r.id})">✕</span>
+        </div>
+      </div>
+      <div class="sbody">${r.content}</div>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--t3);padding:6px 0">No entries yet.</div>';
+}
+async function addStudy(type){
+  if(!currentUser)return;
+  let entry={user_id:currentUser.id,type};
+  if(type==='reading'){
+    const title=document.getElementById('rn-t').value.trim(),content=document.getElementById('rn-b').value.trim();if(!title||!content)return;
+    const ty=document.getElementById('rn-ty').value;
+    entry={...entry,title,sub:[document.getElementById('rn-a').value.trim(),document.getElementById('rn-c').value.trim()].filter(Boolean).join(' · '),content,tag:ty,tag_label:typeLabels[ty]};
+    ['rn-t','rn-a','rn-c','rn-b'].forEach(i=>document.getElementById(i).value='');
+  }else if(type==='online'){
+    const title=document.getElementById('on-t').value.trim(),content=document.getElementById('on-b').value.trim();if(!title||!content)return;
+    entry={...entry,title,sub:document.getElementById('on-p').value.trim(),content,tag:'to',tag_label:'Online'};
+    ['on-t','on-p','on-b'].forEach(i=>document.getElementById(i).value='');
+  }else{
+    const content=document.getElementById('jn-b').value.trim();if(!content)return;
+    entry={...entry,title:document.getElementById('jn-t').value.trim()||'Journal entry',content,tag:'tj',tag_label:'Journal'};
+    ['jn-t','jn-b'].forEach(i=>document.getElementById(i).value='');
+  }
+  const {data,error}=await sb.from('study_entries').insert(entry).select().single();
+  if(error){console.error('addStudy',error);return}
+  studyEntries.unshift(data);renderStudyList(type);
+  document.getElementById('ov-study').textContent=studyEntries.length;
+}
+async function removeStudy(id){
+  await sb.from('study_entries').delete().eq('id',id);
+  studyEntries=studyEntries.filter(x=>x.id!==id);
+  ['reading','online','journal'].forEach(t=>renderStudyList(t));
+  document.getElementById('ov-study').textContent=studyEntries.length;
+}
+
+/* ── DASHBOARD ── */
+function updateDash(){
+  document.getElementById('ov-tasks').textContent=todos.filter(t=>!t.done).length;
+  const up=todos.filter(t=>!t.done).slice(0,4);
+  document.getElementById('dash-tasks').innerHTML=up.length?up.map(t=>`
+    <div class="todo-item"><div class="ck" onclick="toggleTask(${t.id},true)"></div>
+    <span class="tk">${t.text}</span><span class="tdu">${t.due_date||''}</span>
+    <span class="st">${t.subject||''}</span></div>`).join('')
+    :'<div style="font-size:13px;color:var(--t3);padding:8px 0">No pending items.</div>';
+  const recent=[];
+  subjects.forEach(s=>exams.filter(e=>e.subject_id===s.id).slice(-2).forEach(e=>recent.push({subj:s.name,score:e.score,week:e.week})));
+  document.getElementById('dash-grades').innerHTML=recent.length?recent.slice(0,4).map(e=>`
+    <div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:.5px solid var(--bd)">
+      <span style="flex:1;font-size:13px">${e.subj}</span>
+      <span style="font-size:11px;color:var(--t3)">${e.week||''}</span>
+      <span style="font-weight:600;font-size:14px;color:${gcol(e.score||0)}">${e.score??'—'}</span>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--t3);padding:8px 0">No grades yet.</div>';
+}
+
+/* ── TEACHER ── */
 async function loadTeacherData(){
   const {data:students}=await sb.from('profiles').select('*').eq('role','student');
   if(!students||!students.length){
-    document.getElementById('stu-list').innerHTML='<div style="font-size:13px;color:var(--t3);padding:16px 0">No students registered yet.</div>';
-    return;
+    document.getElementById('stu-list').innerHTML='<div style="font-size:13px;color:var(--t3);padding:16px 0">No students registered yet.</div>';return;
   }
   const ids=students.map(s=>s.id);
   const [{data:todos},{data:subjects},{data:goals},{data:study}]=await Promise.all([
@@ -562,9 +856,9 @@ async function loadTeacherData(){
     sb.from('study_entries').select('*').in('user_id',ids),
   ]);
   document.getElementById('stu-list').innerHTML=students.map(s=>{
-    const stodos=(todos||[]).filter(t=>t.user_id===s.id);
-    const done=stodos.filter(t=>t.done).length;
-    const pct=stodos.length?Math.round((done/stodos.length)*100):0;
+    const st=(todos||[]).filter(t=>t.user_id===s.id);
+    const done=st.filter(t=>t.done).length;
+    const pct=st.length?Math.round((done/st.length)*100):0;
     const initials=(s.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     return`<div class="stu-card" onclick="showStudentDetail('${s.id}','${s.name}','${s.grade||''}')">
       <div style="display:flex;align-items:center;gap:11px">
@@ -572,7 +866,7 @@ async function loadTeacherData(){
         <div><div style="font-size:14px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--t2)">${s.grade||''}</div></div>
       </div>
       <div class="stu-stats">
-        <div class="stu-s"><span>${done}/${stodos.length}</span>To-dos</div>
+        <div class="stu-s"><span>${done}/${st.length}</span>To-dos</div>
         <div class="stu-s"><span>${pct}%</span>Completion</div>
         <div class="stu-s"><span>${(subjects||[]).filter(x=>x.user_id===s.id).length}</span>Subjects</div>
         <div class="stu-s"><span>${(goals||[]).filter(x=>x.user_id===s.id).length}</span>Goals</div>
@@ -645,309 +939,6 @@ async function showStudentDetail(uid,name,grade){
 function backToList(){
   document.querySelectorAll('#tmain .page').forEach(p=>p.classList.remove('active'));
   document.getElementById('tp-students').classList.add('active');
-}
-
-// ── NAV ──
-function nav(btn,page){
-  document.querySelectorAll('#student-shell .nb[data-p]').forEach(n=>n.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('#smain .page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  loadAll();
-}
-function navTo(page){
-  document.querySelectorAll('#student-shell .nb[data-p]').forEach(n=>n.classList.toggle('active',n.dataset.p===page));
-  document.querySelectorAll('#smain .page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-}
-function stab(tab,btn){
-  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.spanel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('sp-'+tab).classList.add('active');
-  loadStudy();
-}
-
-async function loadAll(){
-  if(!currentUser)return;
-  await Promise.all([loadTodos(),loadGrades(),loadSchedule(),loadGoals(),loadNotes(),loadStudy()]);
-  updateDash();
-}
-
-// ── TODO ──
-let todos=[];
-async function loadTodos(){
-  const {data}=await sb.from('todos').select('*').eq('user_id',currentUser.id).order('created_at');
-  todos=data||[];renderTodos();
-}
-function renderTodos(){
-  document.getElementById('todo-list').innerHTML=todos.length?todos.map(t=>`
-    <div class="todo-item">
-      <div class="ck ${t.done?'done':''}" onclick="toggleTask(${t.id},${!t.done})"></div>
-      <span class="tk ${t.done?'done':''}">${t.text}</span>
-      <span class="tdu">${t.due_date||''}</span>
-      <span class="st">${t.subject||''}</span>
-      <span class="rm" onclick="removeTask(${t.id})">✕</span>
-    </div>`).join('')
-    :'<div style="font-size:13px;color:var(--t3);padding:10px 0">No items yet.</div>';
-  updateCircle();updateDash();
-}
-async function addTask(){
-  const text=document.getElementById('ti').value.trim();if(!text)return;
-  const {data}=await sb.from('todos').insert({user_id:currentUser.id,text,subject:document.getElementById('ts').value.trim(),due_date:document.getElementById('td').value||null,done:false}).select().single();
-  ['ti','ts','td'].forEach(i=>document.getElementById(i).value='');
-  if(data){todos.push(data);renderTodos();}
-}
-async function toggleTask(id,done){
-  await sb.from('todos').update({done}).eq('id',id);
-  const t=todos.find(x=>x.id===id);if(t)t.done=done;renderTodos();
-}
-async function removeTask(id){
-  await sb.from('todos').delete().eq('id',id);
-  todos=todos.filter(x=>x.id!==id);renderTodos();
-}
-function updateCircle(){
-  const total=todos.length,done=todos.filter(t=>t.done).length;
-  const pct=total?Math.round((done/total)*100):0;
-  const circ=2*Math.PI*34;
-  document.getElementById('cprog').setAttribute('stroke-dashoffset',(circ-(circ*(pct/100))).toFixed(1));
-  document.getElementById('cpct').textContent=pct+'%';
-  document.getElementById('cdone').textContent=done;
-  document.getElementById('ctotal').textContent=total;
-  document.getElementById('cpend').textContent=total-done;
-}
-
-// ── GRADES ──
-let subjects=[];let exams=[];
-async function loadGrades(){
-  const [{data:s},{data:e}]=await Promise.all([
-    sb.from('subjects').select('*').eq('user_id',currentUser.id).order('created_at'),
-    sb.from('exams').select('*').eq('user_id',currentUser.id).order('created_at'),
-  ]);
-  subjects=s||[];exams=e||[];renderGrades();
-}
-function renderGrades(){
-  document.getElementById('subj-list').innerHTML=subjects.map(s=>{
-    const se=exams.filter(e=>e.subject_id===s.id);
-    const cid='chart-'+s.id;
-    return`<div class="subj-block">
-      <div class="subj-hdr"><span class="subj-name">${s.name}</span><span class="rm" onclick="removeSubject(${s.id})">✕</span></div>
-      ${se.length?`<div style="margin-bottom:10px">
-        ${se.map(e=>`<div class="exam-row">
-          <span class="exam-week">${e.week}</span>
-          <div class="exam-bar-w"><div class="exam-bar" style="width:${Math.min(100,e.score||0)}%;background:${gbar(e.score||0)}"></div></div>
-          <span class="exam-score" style="color:${gcol(e.score||0)}">${e.score??'—'}</span>
-          <span class="exam-ch">${e.chapter||''}</span>
-          <span class="exam-rev">${e.review||''}</span>
-          <span class="rm" onclick="removeExam(${e.id},${s.id})">✕</span>
-        </div>`).join('')}
-      </div>
-      ${se.length>=2?`<div style="margin-bottom:10px"><div class="chart-wrap"><canvas id="${cid}" role="img" aria-label="Score trend for ${s.name}">Score trend</canvas></div></div>`:''}`:''}
-      <details style="margin-top:6px">
-        <summary style="font-size:12px;color:var(--ac);cursor:pointer;padding:4px 0">+ Add exam record</summary>
-        <div class="add-exam-form">
-          <div class="frow">
-            <input class="fi" id="ew-${s.id}" type="text" placeholder="Week (e.g. Week 3 / Apr 28)">
-            <input class="fi" id="es-${s.id}" type="number" min="0" max="100" placeholder="Score (0–100)" style="max-width:120px">
-          </div>
-          <div class="frow">
-            <input class="fi" id="ec-${s.id}" type="text" placeholder="Chapter / Section">
-            <input class="fi" id="er-${s.id}" type="text" placeholder="Exam review notes">
-          </div>
-          <button class="btn btn-p btn-sm" onclick="addExam(${s.id})" style="width:fit-content">Save exam</button>
-        </div>
-      </details>
-    </div>`;
-  }).join('')||'';
-  subjects.forEach(s=>{
-    const se=exams.filter(e=>e.subject_id===s.id);
-    if(se.length<2)return;
-    const cid='chart-'+s.id;
-    const el=document.getElementById(cid);if(!el)return;
-    if(chartInstances[cid])chartInstances[cid].destroy();
-    chartInstances[cid]=new Chart(el,{
-      type:'line',
-      data:{labels:se.map(e=>e.week),datasets:[{label:'Score',data:se.map(e=>e.score??null),borderColor:'#7F77DD',backgroundColor:'rgba(127,119,221,0.08)',pointBackgroundColor:'#7F77DD',tension:0.3,fill:true,pointRadius:5}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-        scales:{y:{min:0,max:100,ticks:{color:'#6B6860',font:{size:11}},grid:{color:'rgba(26,24,20,0.06)'}},
-          x:{ticks:{color:'#6B6860',font:{size:11},maxRotation:30},grid:{display:false}}}}
-    });
-  });
-}
-async function addSubject(){
-  const name=document.getElementById('gs').value.trim();if(!name)return;
-  const {data}=await sb.from('subjects').insert({user_id:currentUser.id,name}).select().single();
-  document.getElementById('gs').value='';
-  if(data){subjects.push(data);renderGrades();}
-}
-async function removeSubject(id){
-  await sb.from('subjects').delete().eq('id',id);
-  subjects=subjects.filter(x=>x.id!==id);
-  exams=exams.filter(x=>x.subject_id!==id);
-  renderGrades();
-}
-async function addExam(sid){
-  const week=document.getElementById('ew-'+sid).value.trim();
-  const score=parseFloat(document.getElementById('es-'+sid).value);
-  if(!week||isNaN(score))return;
-  const {data}=await sb.from('exams').insert({user_id:currentUser.id,subject_id:sid,week,score:Math.min(100,Math.max(0,score)),chapter:document.getElementById('ec-'+sid).value.trim(),review:document.getElementById('er-'+sid).value.trim()}).select().single();
-  if(data){exams.push(data);renderGrades();updateDash();}
-}
-async function removeExam(id){
-  await sb.from('exams').delete().eq('id',id);
-  exams=exams.filter(x=>x.id!==id);renderGrades();
-}
-
-// ── SCHEDULE ──
-let schedule=[];
-async function loadSchedule(){
-  const {data}=await sb.from('schedule').select('*').eq('user_id',currentUser.id).order('created_at');
-  schedule=data||[];renderSchedule();
-}
-function renderSchedule(){
-  document.getElementById('week-grid').innerHTML=DAYS.map((d,i)=>`
-    <div class="dc ${i===todayIdx?'tod':''}">
-      <div class="dn">${d}${i===todayIdx?' · today':''}</div>
-      ${schedule.filter(c=>c.day===d).map(c=>`
-        <div class="cb ${c.color}"><div style="font-weight:600">${c.name}</div><div class="ct2">${c.time||''}</div>
-        <div style="font-size:9px;opacity:.4;cursor:pointer;margin-top:2px" onclick="rmCls(${c.id})">remove</div></div>`).join('')}
-    </div>`).join('');
-}
-async function addCls(){
-  const name=document.getElementById('sc-name').value.trim();if(!name)return;
-  const {data}=await sb.from('schedule').insert({user_id:currentUser.id,day:document.getElementById('sc-day').value,name,time:document.getElementById('sc-time').value.trim(),color:document.getElementById('sc-col').value}).select().single();
-  document.getElementById('sc-name').value='';document.getElementById('sc-time').value='';
-  if(data){schedule.push(data);renderSchedule();}
-}
-async function rmCls(id){
-  await sb.from('schedule').delete().eq('id',id);
-  schedule=schedule.filter(x=>x.id!==id);renderSchedule();
-}
-
-// ── GOALS ──
-let goals=[];
-async function loadGoals(){
-  const {data}=await sb.from('goals').select('*').eq('user_id',currentUser.id).order('created_at');
-  goals=data||[];renderGoals();
-}
-function renderGoals(){
-  document.getElementById('goal-list').innerHTML=goals.length?goals.map(g=>`
-    <div class="goal-item">
-      <span class="goal-txt">${g.name}</span>
-      <span class="goal-lbl ${g.label}">${goalLabels[g.label]||g.label}</span>
-      ${g.due_date?`<span class="goal-ddl">${g.due_date}</span>`:''}
-      <span class="rm" onclick="removeGoal(${g.id})">✕</span>
-    </div>`).join('')
-    :'<div style="font-size:13px;color:var(--t3);padding:10px 0">No goals yet.</div>';
-  document.getElementById('ov-goals').textContent=goals.length;
-}
-async function addGoal(){
-  const name=document.getElementById('gn').value.trim();if(!name)return;
-  const {data}=await sb.from('goals').insert({user_id:currentUser.id,name,label:document.getElementById('gl').value,due_date:document.getElementById('gd').value||null}).select().single();
-  ['gn','gd'].forEach(i=>document.getElementById(i).value='');
-  if(data){goals.push(data);renderGoals();}
-}
-async function removeGoal(id){
-  await sb.from('goals').delete().eq('id',id);
-  goals=goals.filter(x=>x.id!==id);renderGoals();
-}
-
-// ── NOTES ──
-let notes=[];
-async function loadNotes(){
-  const {data}=await sb.from('notes').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  notes=data||[];renderNotes();
-}
-function renderNotes(){
-  document.getElementById('notes-grid').innerHTML=notes.map(n=>`
-    <div class="nc2 ${n.color}"><div class="nt2">${n.title}</div><div class="np2">${n.content}</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px">
-      <span style="font-size:10px;opacity:.55">${n.created_at?new Date(n.created_at).toLocaleDateString():''}</span>
-      <span onclick="removeNote(${n.id})" style="cursor:pointer;opacity:.5;font-size:11px">✕</span>
-    </div></div>`).join('')||'<div style="font-size:13px;color:var(--t3)">No notes yet.</div>';
-}
-async function addNote(){
-  const title=document.getElementById('nt-title').value.trim();
-  const content=document.getElementById('nt-content').value.trim();
-  if(!title||!content)return;
-  const {data}=await sb.from('notes').insert({user_id:currentUser.id,title,content,color:document.getElementById('nt-color').value}).select().single();
-  document.getElementById('nt-title').value='';document.getElementById('nt-content').value='';
-  if(data){notes.unshift(data);renderNotes();}
-}
-async function removeNote(id){
-  await sb.from('notes').delete().eq('id',id);
-  notes=notes.filter(n=>n.id!==id);renderNotes();
-}
-
-// ── STUDY ──
-let studyEntries=[];
-async function loadStudy(){
-  const {data}=await sb.from('study_entries').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  studyEntries=data||[];
-  renderStudyList('reading');renderStudyList('online');renderStudyList('journal');
-  document.getElementById('ov-study').textContent=studyEntries.length;
-}
-function renderStudyList(type){
-  const el=document.getElementById('list-'+type);if(!el)return;
-  const list=studyEntries.filter(e=>e.type===type);
-  el.innerHTML=list.length?list.map(r=>`
-    <div class="scard">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-        <div><div class="sttl">${r.title}</div><div class="smeta">${r.sub||''} ${r.created_at?'· '+new Date(r.created_at).toLocaleDateString():''}</div></div>
-        <div style="display:flex;gap:7px;align-items:center">
-          ${r.tag?`<span class="rtag ${r.tag}">${r.tag_label}</span>`:''}
-          <span class="rm" onclick="removeStudy(${r.id})">✕</span>
-        </div>
-      </div>
-      <div class="sbody">${r.content}</div>
-    </div>`).join('')
-    :'<div style="font-size:13px;color:var(--t3);padding:6px 0">No entries yet.</div>';
-}
-async function addStudy(type){
-  if(!currentUser)return;
-  let entry={user_id:currentUser.id,type};
-  if(type==='reading'){
-    const title=document.getElementById('rn-t').value.trim(),content=document.getElementById('rn-b').value.trim();if(!title||!content)return;
-    const ty=document.getElementById('rn-ty').value;
-    entry={...entry,title,sub:[document.getElementById('rn-a').value.trim(),document.getElementById('rn-c').value.trim()].filter(Boolean).join(' · '),content,tag:ty,tag_label:typeLabels[ty]};
-    ['rn-t','rn-a','rn-c','rn-b'].forEach(i=>document.getElementById(i).value='');
-  }else if(type==='online'){
-    const title=document.getElementById('on-t').value.trim(),content=document.getElementById('on-b').value.trim();if(!title||!content)return;
-    entry={...entry,title,sub:document.getElementById('on-p').value.trim(),content,tag:'to',tag_label:'Online'};
-    ['on-t','on-p','on-b'].forEach(i=>document.getElementById(i).value='');
-  }else{
-    const content=document.getElementById('jn-b').value.trim();if(!content)return;
-    entry={...entry,title:document.getElementById('jn-t').value.trim()||'Journal entry',content,tag:'tj',tag_label:'Journal'};
-    ['jn-t','jn-b'].forEach(i=>document.getElementById(i).value='');
-  }
-  const {data}=await sb.from('study_entries').insert(entry).select().single();
-  if(data){studyEntries.unshift(data);renderStudyList(type);document.getElementById('ov-study').textContent=studyEntries.length;}
-}
-async function removeStudy(id){
-  await sb.from('study_entries').delete().eq('id',id);
-  studyEntries=studyEntries.filter(x=>x.id!==id);
-  ['reading','online','journal'].forEach(t=>renderStudyList(t));
-  document.getElementById('ov-study').textContent=studyEntries.length;
-}
-
-// ── DASHBOARD ──
-function updateDash(){
-  document.getElementById('ov-tasks').textContent=todos.filter(t=>!t.done).length;
-  const up=todos.filter(t=>!t.done).slice(0,4);
-  document.getElementById('dash-tasks').innerHTML=up.length?up.map(t=>`
-    <div class="todo-item"><div class="ck" onclick="toggleTask(${t.id},true)"></div>
-    <span class="tk">${t.text}</span><span class="tdu">${t.due_date||''}</span>
-    <span class="st">${t.subject||''}</span></div>`).join('')
-    :'<div style="font-size:13px;color:var(--t3);padding:8px 0">No pending items.</div>';
-  const recent=[];
-  subjects.forEach(s=>exams.filter(e=>e.subject_id===s.id).slice(-2).forEach(e=>recent.push({subj:s.name,score:e.score,week:e.week})));
-  document.getElementById('dash-grades').innerHTML=recent.length?recent.slice(0,4).map(e=>`
-    <div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:.5px solid var(--bd)">
-      <span style="flex:1;font-size:13px">${e.subj}</span>
-      <span style="font-size:11px;color:var(--t3)">${e.week||''}</span>
-      <span style="font-weight:600;font-size:14px;color:${gcol(e.score||0)}">${e.score??'—'}</span>
-    </div>`).join('')
-    :'<div style="font-size:13px;color:var(--t3);padding:8px 0">No grades yet.</div>';
 }
 </script>
 </body>
