@@ -393,7 +393,6 @@ const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov',
 const DAYS=['Mon','Tue','Wed','Thu','Fri'];
 const todayIdx=(()=>{const d=new Date().getDay();return d===0?4:d-1})();
 function fullDate(){const n=new Date();return`${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][n.getDay()]}, ${months[n.getMonth()]} ${n.getDate()}, ${n.getFullYear()}`}
-
 const goalLabels={'lbl-interest':'Hobbies & interests','lbl-study':'Academic study','lbl-extend':'Extended learning','lbl-life':'Life skills','lbl-other':'Other'};
 const typeLabels={'ts2':'Summary','tq':'Key quote','tv':'Vocabulary','tr':'Reflection'};
 const gcol=s=>s>=90?'#3B6D11':s>=80?'#0F6E56':s>=70?'#854F0B':'#993C1D';
@@ -402,6 +401,7 @@ let chartInstances={};
 let currentUser=null;
 let currentProfile=null;
 
+// ── INIT ──
 window.addEventListener('DOMContentLoaded',async()=>{
   const {data:{session}}=await sb.auth.getSession();
   if(session){
@@ -415,16 +415,35 @@ window.addEventListener('DOMContentLoaded',async()=>{
   document.getElementById('loading-screen').classList.add('hidden');
 });
 
+// ── PROFILE ──
 async function loadProfile(){
-  const {data}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
-  // always fall back to auth metadata so name is never missing
-  currentProfile=data||{
-    name:currentUser.user_metadata?.name||'Student',
-    grade:currentUser.user_metadata?.grade||'',
-    role:currentUser.user_metadata?.role||'student'
-  };
-  if(!currentProfile.name){
-    currentProfile.name=currentUser.user_metadata?.name||'Student';
+  try{
+    const {data,error}=await sb.from('profiles').select('*').eq('id',currentUser.id).single();
+    if(data){
+      currentProfile=data;
+      if(!currentProfile.name){
+        currentProfile.name=currentUser.user_metadata?.name||'Student';
+      }
+    } else {
+      // profile not found — create it now from auth metadata
+      const meta=currentUser.user_metadata||{};
+      const insert={
+        id:currentUser.id,
+        name:meta.name||'Student',
+        grade:meta.grade||'',
+        role:meta.role||'student'
+      };
+      await sb.from('profiles').upsert(insert);
+      currentProfile=insert;
+    }
+  } catch(e){
+    // fallback: just use auth metadata
+    const meta=currentUser.user_metadata||{};
+    currentProfile={
+      name:meta.name||'Student',
+      grade:meta.grade||'',
+      role:meta.role||'student'
+    };
   }
 }
 
@@ -434,6 +453,7 @@ function show(id){
   document.getElementById(id).classList.remove('hidden');
 }
 
+// ── AUTH ──
 function switchAuthTab(tab,btn){
   document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
@@ -447,15 +467,20 @@ async function doRegister(){
   const pass=document.getElementById('rg-p').value;
   const grade=document.getElementById('rg-g').value;
   const err=document.getElementById('rg-err');
-  if(!name||!email||!pass||!grade){err.textContent='Please fill in all fields.';return}
+  if(!name||!email||!pass||!grade){err.style.color='#A32D2D';err.textContent='Please fill in all fields.';return}
   err.style.color='#A32D2D';err.textContent='Creating account…';
-  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name,grade,role:'student'}}});
+  const {data,error}=await sb.auth.signUp({
+    email,password:pass,
+    options:{data:{name,grade,role:'student'}}
+  });
   if(error){err.textContent=error.message;return}
   currentUser=data.user;
+  // manually upsert profile in case trigger fails
+  await sb.from('profiles').upsert({id:currentUser.id,name,grade,role:'student'});
   await loadProfile();
   err.style.color='#3B6D11';
   err.textContent='Account created! Signing you in…';
-  setTimeout(()=>enterStudent(),800);
+  setTimeout(()=>enterStudent(),600);
 }
 
 async function doLogin(){
@@ -489,6 +514,7 @@ function enterStudent(){
   loadAll();
 }
 
+// ── TEACHER ──
 function showTeacherLogin(){show('teacher-login')}
 function hideTeacherLogin(){show('student-shell')}
 
@@ -496,12 +522,17 @@ async function doTeacherLogin(){
   const email=document.getElementById('tu').value.trim();
   const pass=document.getElementById('tp').value;
   const err=document.getElementById('t-err');
-  err.textContent='Signing in…';
+  err.style.color='#A32D2D';err.textContent='Signing in…';
   const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){err.textContent=error.message;return}
   currentUser=data.user;
   await loadProfile();
-  if(currentProfile?.role!=='teacher'){err.textContent='This account does not have teacher access.';return}
+  if(currentProfile?.role!=='teacher'){
+    err.textContent='This account does not have teacher access.';
+    await sb.auth.signOut();
+    currentUser=null;currentProfile=null;
+    return;
+  }
   err.textContent='';
   enterTeacher();
 }
@@ -616,6 +647,7 @@ function backToList(){
   document.getElementById('tp-students').classList.add('active');
 }
 
+// ── NAV ──
 function nav(btn,page){
   document.querySelectorAll('#student-shell .nb[data-p]').forEach(n=>n.classList.remove('active'));
   btn.classList.add('active');
@@ -642,6 +674,7 @@ async function loadAll(){
   updateDash();
 }
 
+// ── TODO ──
 let todos=[];
 async function loadTodos(){
   const {data}=await sb.from('todos').select('*').eq('user_id',currentUser.id).order('created_at');
@@ -684,6 +717,7 @@ function updateCircle(){
   document.getElementById('cpend').textContent=total-done;
 }
 
+// ── GRADES ──
 let subjects=[];let exams=[];
 async function loadGrades(){
   const [{data:s},{data:e}]=await Promise.all([
@@ -764,6 +798,7 @@ async function removeExam(id){
   exams=exams.filter(x=>x.id!==id);renderGrades();
 }
 
+// ── SCHEDULE ──
 let schedule=[];
 async function loadSchedule(){
   const {data}=await sb.from('schedule').select('*').eq('user_id',currentUser.id).order('created_at');
@@ -789,6 +824,7 @@ async function rmCls(id){
   schedule=schedule.filter(x=>x.id!==id);renderSchedule();
 }
 
+// ── GOALS ──
 let goals=[];
 async function loadGoals(){
   const {data}=await sb.from('goals').select('*').eq('user_id',currentUser.id).order('created_at');
@@ -816,6 +852,7 @@ async function removeGoal(id){
   goals=goals.filter(x=>x.id!==id);renderGoals();
 }
 
+// ── NOTES ──
 let notes=[];
 async function loadNotes(){
   const {data}=await sb.from('notes').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
@@ -842,6 +879,7 @@ async function removeNote(id){
   notes=notes.filter(n=>n.id!==id);renderNotes();
 }
 
+// ── STUDY ──
 let studyEntries=[];
 async function loadStudy(){
   const {data}=await sb.from('study_entries').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
@@ -892,6 +930,7 @@ async function removeStudy(id){
   document.getElementById('ov-study').textContent=studyEntries.length;
 }
 
+// ── DASHBOARD ──
 function updateDash(){
   document.getElementById('ov-tasks').textContent=todos.filter(t=>!t.done).length;
   const up=todos.filter(t=>!t.done).slice(0,4);
